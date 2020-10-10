@@ -1,0 +1,12 @@
+<resources>
+    <string name="firstName">FirstName</string>
+    <string name="name">Name</string>
+    <string name="contractNumber">Contract Number:</string>
+    <string name="contractPartner">Contractpartner:</string>
+    <string name="signature">Signature:</string>
+    <string name="docPhotos">Photos for documentation</string>
+    <string name="app_name" translatable="false">Simple Exchange Protocol</string>
+    <string name="clearDrawboard">Clear Signature</string>
+    <string name="takePhoto">Take Photo</string>
+    <string name="pdfFinish">Create pdf File</string>
+</resources>
