@@ -2,6 +2,7 @@ package com.example.simpleexchangeprotocol;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
@@ -20,14 +21,17 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Paint;
+import android.graphics.drawable.BitmapDrawable;
 import android.graphics.pdf.PdfDocument;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.DocumentsContract;
 import android.provider.MediaStore;
 import android.util.DisplayMetrics;
 import android.view.View;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Toast;
 
@@ -36,11 +40,15 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
+import java.text.SimpleDateFormat;
+import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Date;
 
 public class NewContract extends AppCompatActivity {
 
     private ImageView[] imageView = new ImageView[6];
+    private int[][] position = new int[6][2];
     private File photoFile;
     private static int REQUEST_CODE = 1;
     private Bitmap header, footer;
@@ -48,10 +56,9 @@ public class NewContract extends AppCompatActivity {
     private int picCount = 0;
     private PaintView paintView;
     private int STORAGE_PERMISSION_CODE = 1;
+    private EditText contractnumber,partnerfirst,partnersecond;
 
-    private String myEditText = "Hello there /nGeneral Kenobi!";
-
-
+    @RequiresApi(api = Build.VERSION_CODES.O)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -68,6 +75,23 @@ public class NewContract extends AppCompatActivity {
         getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
 
         paintView.initialise(displayMetrics);
+
+        position[0][0] = 200;
+        position[0][1] = 1100;
+        position[1][0] = 1200;
+        position[1][1] = 1100;
+        position[2][0] = 200;
+        position[2][1] = 1750;
+        position[3][0] = 1200;
+        position[3][1] = 1750;
+        position[4][0] = 200;
+        position[4][1] = 2400;
+        position[5][0] = 1200;
+        position[5][1] = 2400;
+
+        contractnumber = (EditText) findViewById(R.id.ContractNumberInput);
+        partnerfirst = (EditText) findViewById(R.id.ContractPartnerFirstName);
+        partnersecond = (EditText) findViewById(R.id.ContractPartnerName);
 
         ActivityCompat.requestPermissions(NewContract.this,
                 new String[]{Manifest.permission.READ_EXTERNAL_STORAGE,
@@ -171,13 +195,36 @@ public class NewContract extends AppCompatActivity {
 
     public void createMyPDF(View view) {
 
+        String date = new SimpleDateFormat("dd-MM-yyyy").format(new Date());
+        String number = contractnumber.getText().toString();
+        String partner = partnerfirst.getText().toString() + "," + partnersecond.getText().toString();
+
         PdfDocument myPdfDocument = new PdfDocument();
         PdfDocument.PageInfo myPageInfo = new PdfDocument.PageInfo.Builder(2480, 3508, 1).create();
         PdfDocument.Page myPage = myPdfDocument.startPage(myPageInfo);
 
         Paint myPaint = new Paint();
 
-        //myPage.getCanvas().drawBitmap(imageView[1],);
+        myPage.getCanvas().drawBitmap(header,200,100, myPaint); //200, 100
+
+        myPage.getCanvas().drawText("Vertragsnummer: " + number,200,600,myPaint);//200, 600
+
+        myPage.getCanvas().drawText("Dokumentation über Zustand verfasst am " + date + "." + "/n/n Dokumentations Bilder:",
+                200,850,myPaint);//200,850
+
+        int i = 0;
+
+        while (!imageView[i].equals(null)){
+
+            BitmapDrawable drawable = (BitmapDrawable) imageView[1].getDrawable();
+            Bitmap bitmap = drawable.getBitmap();
+
+            myPage.getCanvas().drawBitmap(bitmap,position[i][1],position[i][2],myPaint);
+
+            i++;
+        }
+
+        myPage.getCanvas().drawText(partner + " am " + date,200,3200,myPaint);//200,3200
 
         myPdfDocument.finishPage(myPage);
 
