@@ -80,11 +80,11 @@ public class PaintView extends View {
     protected void onDraw(Canvas canvas) {
 
         canvas.save();
-        mCanvas.drawColor(backgroundColor); // WRONG
+        //mCanvas.drawColor(backgroundColor); // WRONG
 
         for (Draw draw : paths) {
 
-            mPaint.setColor(draw.color); // WRONG
+            //mPaint.setColor(draw.color); // WRONG
             mPaint.setStrokeWidth(draw.strokeWidth);
             mPaint.setMaskFilter(null);
 

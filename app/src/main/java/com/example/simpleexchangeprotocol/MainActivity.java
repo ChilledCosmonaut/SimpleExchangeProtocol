@@ -40,7 +40,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void ChangeActivity(View view) {
-        Intent intent = new Intent(this, NewContract.class);
+        Intent intent = new Intent(getApplicationContext(), NewContract.class);
         startActivity(intent);
     }
 

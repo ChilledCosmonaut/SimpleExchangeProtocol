@@ -19,7 +19,6 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.pdf.PdfDocument;
@@ -36,12 +35,9 @@ import android.widget.ImageView;
 import android.widget.Toast;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.OutputStreamWriter;
 import java.text.SimpleDateFormat;
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Date;
 
@@ -50,7 +46,7 @@ public class NewContract extends AppCompatActivity {
     private ImageView[] imageView = new ImageView[6];
     private int[][] position = new int[6][2];
     private File photoFile;
-    private static int REQUEST_CODE = 1;
+    private static final int REQUEST_CODE = 1;
     private Bitmap header, footer;
     private ArrayList<Bitmap> documentPictures = new ArrayList<>();
     private int picCount = 0;
@@ -205,7 +201,7 @@ public class NewContract extends AppCompatActivity {
 
         Paint myPaint = new Paint();
 
-        myPage.getCanvas().drawBitmap(header,200,100, myPaint); //200, 100
+        //myPage.getCanvas().drawBitmap(header,200,100, myPaint); //200, 100
 
         myPage.getCanvas().drawText("Vertragsnummer: " + number,200,600,myPaint);//200, 600
 
@@ -214,40 +210,40 @@ public class NewContract extends AppCompatActivity {
 
         int i = 0;
 
-        while (!imageView[i].equals(null)){
+        /*while (i < 6) {
 
             BitmapDrawable drawable = (BitmapDrawable) imageView[1].getDrawable();
             Bitmap bitmap = drawable.getBitmap();
 
-            myPage.getCanvas().drawBitmap(bitmap,position[i][1],position[i][2],myPaint);
+            myPage.getCanvas().drawBitmap(bitmap, position[i][1], position[i][2], myPaint);
 
             i++;
-        }
-
+        }*/
         myPage.getCanvas().drawText(partner + " am " + date,200,3200,myPaint);//200,3200
 
         myPdfDocument.finishPage(myPage);
 
         ContextWrapper cw = new ContextWrapper(getApplicationContext());
 
-        File myFilePath = cw.getDir("documentDir", Context.MODE_PRIVATE);//Environment.getExternalStorageDirectory().getPath() + "/myPDFFile.pdf";
-        File myFile = new File(myFilePath,"Contract" + ".pdf");
+        //File myFilePath = cw.getDir("documentDir", Context.MODE_PRIVATE);
+        //Environment.getExternalStorageDirectory().getPath() + "/myPDFFile.pdf";
+        File myFile = new File(Environment.getExternalStorageDirectory().getPath() + "/myPDFFile.pdf"/*myFilePath,"Contract" + ".pdf"*/);
         try {
             myPdfDocument.writeTo(new FileOutputStream(myFile));
-            Toast.makeText(this,"Pdf saved at: " + myFilePath, Toast.LENGTH_LONG).show();
+            Toast.makeText(this, myFile.toString()/*myFilePath*/, Toast.LENGTH_LONG).show();
         } catch (Exception e) {
             e.printStackTrace();
-            Toast.makeText(this, "Could not save Pdf because of: " + e.toString(), Toast.LENGTH_LONG).show();
+            System.out.println( "Could not save Pdf because of: " + e.toString());
             myFile.mkdir();
         }
 
         myPdfDocument.close();
 
         try {
-            //openPdf(myFile);
-            openFolder(myFilePath.toString());
+            openPdf(myFile);
+            //openFolder(Environment.getExternalStorageDirectory().getPath() + "/myPDFFile.pdf"/*myFilePath.toString()*/);
         }catch (Exception e){
-            Toast.makeText(this, e.toString(), Toast.LENGTH_LONG);
+            Toast.makeText(this, e.toString(), Toast.LENGTH_LONG).show();
         }
     }
 
