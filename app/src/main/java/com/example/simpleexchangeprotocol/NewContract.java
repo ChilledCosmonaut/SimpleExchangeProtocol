@@ -2,7 +2,6 @@ package com.example.simpleexchangeprotocol;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
@@ -12,7 +11,6 @@ import androidx.core.content.FileProvider;
 import android.Manifest;
 import android.app.Activity;
 import android.content.ActivityNotFoundException;
-import android.content.Context;
 import android.content.ContextWrapper;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -23,7 +21,6 @@ import android.graphics.Paint;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.pdf.PdfDocument;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.ParcelFileDescriptor;
@@ -56,7 +53,7 @@ public class NewContract extends AppCompatActivity {
     private int picCount = 0;
     private PaintView paintView;
     private int STORAGE_PERMISSION_CODE = 1;
-    private EditText contractnumber,partnerfirst,partnersecond;
+    private EditText contractNumber, partnerFirst, partnerSecond;
     private PdfDocument myPdfDocument;
 
     @Override
@@ -89,9 +86,9 @@ public class NewContract extends AppCompatActivity {
         position[5][0] = 1200;
         position[5][1] = 2400;
 
-        contractnumber = (EditText) findViewById(R.id.ContractNumberInput);
-        partnerfirst = (EditText) findViewById(R.id.ContractPartnerFirstName);
-        partnersecond = (EditText) findViewById(R.id.ContractPartnerName);
+        contractNumber = (EditText) findViewById(R.id.ContractNumberInput);
+        partnerFirst = (EditText) findViewById(R.id.ContractPartnerFirstName);
+        partnerSecond = (EditText) findViewById(R.id.ContractPartnerName);
 
         ActivityCompat.requestPermissions(NewContract.this,
                 new String[]{Manifest.permission.READ_EXTERNAL_STORAGE,
@@ -201,8 +198,8 @@ public class NewContract extends AppCompatActivity {
     public void createMyPDF(View view) {
 
         String date = new SimpleDateFormat("dd-MM-yyyy").format(new Date());
-        String number = contractnumber.getText().toString();
-        String partner = partnerfirst.getText().toString() + "," + partnersecond.getText().toString();
+        String number = contractNumber.getText().toString();
+        String partner = partnerFirst.getText().toString() + "," + partnerSecond.getText().toString();
 
         myPdfDocument = new PdfDocument();
         PdfDocument.PageInfo myPageInfo = new PdfDocument.PageInfo.Builder(2480, 3508, 1).create();
@@ -221,17 +218,14 @@ public class NewContract extends AppCompatActivity {
 
         myPage.getCanvas().drawText("Dokumentations Bilder:",200,950,myPaint);//200,900
 
-        int i = 0;
+        for (int i = 0; i < 6; i++) {
 
-        /*while (i < 6) {
-
-            BitmapDrawable drawable = (BitmapDrawable) imageView[1].getDrawable();
-            Bitmap bitmap = drawable.getBitmap();
-
-            myPage.getCanvas().drawBitmap(bitmap, position[i][1], position[i][2], myPaint);
-
-            i++;
-        }*/
+            if (imageView[i].equals(null)){
+                BitmapDrawable drawable = (BitmapDrawable) imageView[1].getDrawable();
+                Bitmap bitmap = drawable.getBitmap();
+                myPage.getCanvas().drawBitmap(bitmap, position[i][1], position[i][2], myPaint);
+            }
+        }
 
         myPaint.setTextSize(32);
 
@@ -243,7 +237,7 @@ public class NewContract extends AppCompatActivity {
 
         //File myFilePath = cw.getDir("documentDir", Context.MODE_PRIVATE);
         //Environment.getExternalStorageDirectory().getPath() + "/myPDFFile.pdf";
-        File myFile = new File(Environment.getExternalStorageDirectory().getPath() + "/myPDFFile.pdf"/*myFilePath,"Contract" + ".pdf"*/);
+        File myFile = new File(Environment.getExternalStorageDirectory().getPath() + "/myPDFFile33444.pdf"/*myFilePath,"Contract" + ".pdf"*/);
         try {
             createFile(Uri.fromFile(myFile));
             //Toast.makeText(this, myFile.toString()/*myFilePath*/, Toast.LENGTH_LONG).show();

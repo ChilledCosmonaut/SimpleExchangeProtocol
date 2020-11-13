@@ -1,0 +1,119 @@
+Index: app/src/main/AndroidManifest.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+><?xml version=\"1.0\" encoding=\"utf-8\"?>\n<manifest xmlns:android=\"http://schemas.android.com/apk/res/android\"\n    package=\"com.example.simpleexchangeprotocol\">\n    <uses-permission android:name=\"android.permission.WRITE_EXTERNAL_STORAGE\"/>\n\n    <application\n        android:allowBackup=\"true\"\n        android:icon=\"@mipmap/ic_launcher\"\n        android:label=\"@string/app_name\"\n        android:roundIcon=\"@mipmap/ic_launcher_round\"\n        android:supportsRtl=\"true\"\n        android:theme=\"@style/AppTheme\"\n        android:requestLegacyExternalStorage=\"true\">\n        <activity android:name=\".NewContract\"></activity>\n        <activity android:name=\".MainActivity\">\n            <intent-filter>\n                <action android:name=\"android.intent.action.MAIN\" />\n\n                <category android:name=\"android.intent.category.LAUNCHER\" />\n            </intent-filter>\n        </activity>\n    </application>\n\n</manifest>
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- app/src/main/AndroidManifest.xml	(revision 60ed632d65b28a6372a6c8b68adddcedd1d86b76)
++++ app/src/main/AndroidManifest.xml	(date 1605169852000)
+@@ -2,6 +2,7 @@
+ <manifest xmlns:android="http://schemas.android.com/apk/res/android"
+     package="com.example.simpleexchangeprotocol">
+     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
++    <uses-permission android:name="android.permission.CAMERA" />
+ 
+     <application
+         android:allowBackup="true"
+Index: app/src/main/java/com/example/simpleexchangeprotocol/NewContract.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package com.example.simpleexchangeprotocol;\n\nimport androidx.annotation.NonNull;\nimport androidx.annotation.Nullable;\nimport androidx.annotation.RequiresApi;\nimport androidx.appcompat.app.AlertDialog;\nimport androidx.appcompat.app.AppCompatActivity;\nimport androidx.core.app.ActivityCompat;\nimport androidx.core.content.ContextCompat;\nimport androidx.core.content.FileProvider;\n\nimport android.Manifest;\nimport android.app.Activity;\nimport android.content.ActivityNotFoundException;\nimport android.content.Context;\nimport android.content.ContextWrapper;\nimport android.content.DialogInterface;\nimport android.content.Intent;\nimport android.content.pm.PackageManager;\nimport android.graphics.Bitmap;\nimport android.graphics.BitmapFactory;\nimport android.graphics.Paint;\nimport android.graphics.drawable.BitmapDrawable;\nimport android.graphics.pdf.PdfDocument;\nimport android.net.Uri;\nimport android.os.Build;\nimport android.os.Bundle;\nimport android.os.Environment;\nimport android.provider.DocumentsContract;\nimport android.provider.MediaStore;\nimport android.util.DisplayMetrics;\nimport android.view.View;\nimport android.widget.EditText;\nimport android.widget.ImageView;\nimport android.widget.Toast;\n\nimport java.io.File;\nimport java.io.FileOutputStream;\nimport java.io.IOException;\nimport java.text.SimpleDateFormat;\nimport java.util.ArrayList;\nimport java.util.Date;\n\npublic class NewContract extends AppCompatActivity {\n\n    private ImageView[] imageView = new ImageView[6];\n    private int[][] position = new int[6][2];\n    private File photoFile;\n    private static final int REQUEST_CODE = 1;\n    private Bitmap header, footer;\n    private ArrayList<Bitmap> documentPictures = new ArrayList<>();\n    private int picCount = 0;\n    private PaintView paintView;\n    private int STORAGE_PERMISSION_CODE = 1;\n    private EditText contractnumber,partnerfirst,partnersecond;\n\n    @RequiresApi(api = Build.VERSION_CODES.O)\n    @Override\n    protected void onCreate(Bundle savedInstanceState) {\n        super.onCreate(savedInstanceState);\n        setContentView(R.layout.activity_new_contract);\n        imageView[0] = findViewById(R.id.imageView);\n        imageView[1] = findViewById(R.id.imageView1);\n        imageView[2] = findViewById(R.id.imageView2);\n        imageView[3] = findViewById(R.id.imageView3);\n        imageView[4] = findViewById(R.id.imageView4);\n        imageView[5] = findViewById(R.id.imageView5);\n        paintView = findViewById(R.id.paintView);\n        DisplayMetrics displayMetrics = new DisplayMetrics();\n\n        getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);\n\n        paintView.initialise(displayMetrics);\n\n        position[0][0] = 200;\n        position[0][1] = 1100;\n        position[1][0] = 1200;\n        position[1][1] = 1100;\n        position[2][0] = 200;\n        position[2][1] = 1750;\n        position[3][0] = 1200;\n        position[3][1] = 1750;\n        position[4][0] = 200;\n        position[4][1] = 2400;\n        position[5][0] = 1200;\n        position[5][1] = 2400;\n\n        contractnumber = (EditText) findViewById(R.id.ContractNumberInput);\n        partnerfirst = (EditText) findViewById(R.id.ContractPartnerFirstName);\n        partnersecond = (EditText) findViewById(R.id.ContractPartnerName);\n\n        ActivityCompat.requestPermissions(NewContract.this,\n                new String[]{Manifest.permission.READ_EXTERNAL_STORAGE,\n                        Manifest.permission.WRITE_EXTERNAL_STORAGE},\n                PackageManager.PERMISSION_GRANTED);\n    }\n\n    @Override\n    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {\n        if (requestCode == REQUEST_CODE && resultCode == Activity.RESULT_OK) {\n            //Bitmap takenImage = (Bitmap) data.getExtras().get(\"data\");\n            Bitmap takenImage = BitmapFactory.decodeFile(photoFile.getAbsolutePath());\n            imageView[picCount].setImageBitmap(takenImage);\n            documentPictures.add(takenImage);\n            picCount++;\n        } else {\n            super.onActivityResult(requestCode, resultCode, data);\n        }\n    }\n\n    public void takePicture(View view) throws IOException {\n        Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);\n        String FILE_NAME = \"photo\" + picCount + \".jpg\";\n        photoFile = getPhotoFile(FILE_NAME);\n\n        Uri fileProvider = FileProvider.getUriForFile(this, \"com.example.fileprovider\", photoFile);\n        takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, fileProvider);\n        if (takePictureIntent.resolveActivity(getPackageManager()) != null) {\n            startActivityForResult(takePictureIntent, REQUEST_CODE);\n        } else {\n            Toast.makeText(this, \"Unable to open camera\", Toast.LENGTH_SHORT).show();\n        }\n    }\n\n    private File getPhotoFile(String fileName) throws IOException {\n        //Use 'getExternaFilesDir' on Context to access package-specific directories.\n        File storageDirectory = getExternalFilesDir(Environment.DIRECTORY_PICTURES);\n        return File.createTempFile(fileName, \".jpg\", storageDirectory);\n    }\n\n    private void requestStoragePermission() {\n\n        System.out.println(\"Request Permisssion\");\n\n        if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)) {\n\n            new AlertDialog.Builder(this)\n                    .setTitle(\"Permission needed\")\n                    .setMessage(\"Needed to save image\")\n                    .setPositiveButton(\"OK\", new DialogInterface.OnClickListener() {\n\n                        @Override\n                        public void onClick(DialogInterface dialog, int which) {\n\n                            ActivityCompat.requestPermissions(NewContract.this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, STORAGE_PERMISSION_CODE);\n\n                        }\n                    })\n                    .setNegativeButton(\"Cancel\", new DialogInterface.OnClickListener() {\n\n                        @Override\n                        public void onClick(DialogInterface dialog, int which) {\n\n                            dialog.dismiss();\n\n                        }\n\n                    })\n                    .create().show();\n\n        } else {\n\n            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, STORAGE_PERMISSION_CODE);\n\n        }\n\n    }\n\n    @Override\n    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {\n\n        if (requestCode == STORAGE_PERMISSION_CODE) {\n\n            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {\n\n                Toast.makeText(this, \"Access granted\", Toast.LENGTH_LONG).show();\n\n            } else {\n\n                Toast.makeText(this, \"Access denied\", Toast.LENGTH_LONG).show();\n\n            }\n\n        }\n\n    }\n\n    public void ClearDrawingPad(View view) {\n        paintView.clear();\n    }\n\n    public void createMyPDF(View view) {\n\n        String date = new SimpleDateFormat(\"dd-MM-yyyy\").format(new Date());\n        String number = contractnumber.getText().toString();\n        String partner = partnerfirst.getText().toString() + \",\" + partnersecond.getText().toString();\n\n        PdfDocument myPdfDocument = new PdfDocument();\n        PdfDocument.PageInfo myPageInfo = new PdfDocument.PageInfo.Builder(2480, 3508, 1).create();\n        PdfDocument.Page myPage = myPdfDocument.startPage(myPageInfo);\n\n        Paint myPaint = new Paint();\n\n        //myPage.getCanvas().drawBitmap(header,200,100, myPaint); //200, 100\n\n        myPage.getCanvas().drawText(\"Vertragsnummer: \" + number,200,600,myPaint);//200, 600\n\n        myPage.getCanvas().drawText(\"Dokumentation über Zustand verfasst am \" + date + \".\" + \"/n/n Dokumentations Bilder:\",\n                200,850,myPaint);//200,850\n\n        int i = 0;\n\n        /*while (i < 6) {\n\n            BitmapDrawable drawable = (BitmapDrawable) imageView[1].getDrawable();\n            Bitmap bitmap = drawable.getBitmap();\n\n            myPage.getCanvas().drawBitmap(bitmap, position[i][1], position[i][2], myPaint);\n\n            i++;\n        }*/\n        myPage.getCanvas().drawText(partner + \" am \" + date,200,3200,myPaint);//200,3200\n\n        myPdfDocument.finishPage(myPage);\n\n        ContextWrapper cw = new ContextWrapper(getApplicationContext());\n\n        //File myFilePath = cw.getDir(\"documentDir\", Context.MODE_PRIVATE);\n        //Environment.getExternalStorageDirectory().getPath() + \"/myPDFFile.pdf\";\n        File myFile = new File(Environment.getExternalStorageDirectory().getPath() + \"/myPDFFile.pdf\"/*myFilePath,\"Contract\" + \".pdf\"*/);\n        try {\n            myPdfDocument.writeTo(new FileOutputStream(myFile));\n            Toast.makeText(this, myFile.toString()/*myFilePath*/, Toast.LENGTH_LONG).show();\n        } catch (Exception e) {\n            e.printStackTrace();\n            System.out.println( \"Could not save Pdf because of: \" + e.toString());\n            myFile.mkdir();\n        }\n\n        myPdfDocument.close();\n\n        try {\n            openPdf(myFile);\n            //openFolder(Environment.getExternalStorageDirectory().getPath() + \"/myPDFFile.pdf\"/*myFilePath.toString()*/);\n        }catch (Exception e){\n            Toast.makeText(this, e.toString(), Toast.LENGTH_LONG).show();\n        }\n    }\n\n    private void openPdf(File fileToOpen) {\n\n        //File file = new File(\"mnt/sdcard.test.pdf\");\n        Uri path = Uri.fromFile(fileToOpen);\n        Intent intent = new Intent(Intent.ACTION_VIEW);\n        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);\n        intent.setAction(Intent.ACTION_VIEW);\n        intent.setData(path);\n        intent.setType(\"application/pdf\");\n        try {\n            startActivity(intent);\n        } catch (ActivityNotFoundException e) {\n            Toast.makeText(this, \"No application found\",\n                    Toast.LENGTH_SHORT).show();\n        }\n    }\n\n    private void openFolder(String location)\n    {\n        // location = \"/sdcard/my_folder\";\n        Toast.makeText(this, \"Trying to Open Folder\", Toast.LENGTH_LONG);\n        Intent intent = new Intent(Intent.ACTION_VIEW);\n        Uri mydir = Uri.parse(\"file://\"+location);\n        intent.setDataAndType(mydir,\"application/*\");    // or use */*\n        startActivity(intent);\n    }\n\n    /*public void CreatePDF(View view) throws IOException {\n\n        this.Save();\n\n        PdfDocument document = new PdfDocument();\n\n        Paint picturePaint = new Paint();\n        Paint textPaint = new Paint();\n\n        int height = 3508;\n        int width = 2480;\n        PdfDocument.PageInfo pageInfo = new PdfDocument.PageInfo.Builder(width, height,1).create();\n\n        PdfDocument.Page page = document.startPage(pageInfo);\n\n        Canvas canvas = page.getCanvas();\n\n        //canvas.drawBitmap(header,0,0,picturePaint);\n\n        //canvas.drawBitmap(documentPictures.get(0),width/2,height/2,picturePaint);\n\n        document.finishPage(page);\n\n        int pdfCount = 0;\n        String filename = \"/Vertrag\" + pdfCount + \".pdf\";\n\n        File file = getExternalFilesDir(Environment.DIRECTORY_PICTURES + \"Contract\" + pdfCount + \".pdf\");\n\n        document.close();\n\n        try {\n\n            document.writeTo(new FileOutputStream(file));\n\n        } catch (IOException e){\n\n            e.printStackTrace();\n            Toast.makeText(this, \"Saving failed\", Toast.LENGTH_LONG);\n\n        }\n\n\n\n        File pdffile = new File(Environment.getExternalStorageDirectory().getAbsolutePath() +\"/\"+ filename);\n        Intent target = new Intent(Intent.ACTION_VIEW);\n        target.setDataAndType(Uri.fromFile(file),\"application/pdf\");\n        target.setFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);\n\n        Intent intent = Intent.createChooser(target, \"Open File\");\n        try {\n            startActivity(intent);\n        } catch (ActivityNotFoundException e) {\n           Toast.makeText(this, \"Please install pdfViewer\", Toast.LENGTH_LONG).show();\n        }\n    }*/\n\n    private static final int CREATE_FILE = 1;\n\n    private void createFile(File pickerInitialUri) {\n        Intent intent = new Intent(Intent.ACTION_CREATE_DOCUMENT);\n        intent.addCategory(Intent.CATEGORY_OPENABLE);\n        intent.setType(\"application/pdf\");\n        intent.putExtra(Intent.EXTRA_TITLE, \"invoice.pdf\");\n\n        // Optionally, specify a URI for the directory that should be opened in\n        // the system file picker when your app creates the document.\n        intent.putExtra(DocumentsContract.EXTRA_INITIAL_URI, pickerInitialUri);\n\n        startActivityForResult(intent, CREATE_FILE);\n\n    }\n\n\n        private void Save () {\n\n        System.out.println(\"Trying to save\");\n\n        if (ContextCompat.checkSelfPermission(NewContract.this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {\n\n            System.out.println(\"Request permission\");\n            requestStoragePermission();\n        }\n\n        paintView.saveImage();\n\n        /*Intent intent = new Intent(this, MainActivity.class);\n        startActivity(intent);*/\n\n    }\n}
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- app/src/main/java/com/example/simpleexchangeprotocol/NewContract.java	(revision 60ed632d65b28a6372a6c8b68adddcedd1d86b76)
++++ app/src/main/java/com/example/simpleexchangeprotocol/NewContract.java	(date 1605170407000)
+@@ -2,7 +2,6 @@
+ 
+ import androidx.annotation.NonNull;
+ import androidx.annotation.Nullable;
+-import androidx.annotation.RequiresApi;
+ import androidx.appcompat.app.AlertDialog;
+ import androidx.appcompat.app.AppCompatActivity;
+ import androidx.core.app.ActivityCompat;
+@@ -12,7 +11,6 @@
+ import android.Manifest;
+ import android.app.Activity;
+ import android.content.ActivityNotFoundException;
+-import android.content.Context;
+ import android.content.ContextWrapper;
+ import android.content.DialogInterface;
+ import android.content.Intent;
+@@ -23,7 +21,6 @@
+ import android.graphics.drawable.BitmapDrawable;
+ import android.graphics.pdf.PdfDocument;
+ import android.net.Uri;
+-import android.os.Build;
+ import android.os.Bundle;
+ import android.os.Environment;
+ import android.provider.DocumentsContract;
+@@ -52,9 +49,8 @@
+     private int picCount = 0;
+     private PaintView paintView;
+     private int STORAGE_PERMISSION_CODE = 1;
+-    private EditText contractnumber,partnerfirst,partnersecond;
++    private EditText contractNumber, partnerFirst, partnerSecond;
+ 
+-    @RequiresApi(api = Build.VERSION_CODES.O)
+     @Override
+     protected void onCreate(Bundle savedInstanceState) {
+         super.onCreate(savedInstanceState);
+@@ -85,9 +81,9 @@
+         position[5][0] = 1200;
+         position[5][1] = 2400;
+ 
+-        contractnumber = (EditText) findViewById(R.id.ContractNumberInput);
+-        partnerfirst = (EditText) findViewById(R.id.ContractPartnerFirstName);
+-        partnersecond = (EditText) findViewById(R.id.ContractPartnerName);
++        contractNumber = (EditText) findViewById(R.id.ContractNumberInput);
++        partnerFirst = (EditText) findViewById(R.id.ContractPartnerFirstName);
++        partnerSecond = (EditText) findViewById(R.id.ContractPartnerName);
+ 
+         ActivityCompat.requestPermissions(NewContract.this,
+                 new String[]{Manifest.permission.READ_EXTERNAL_STORAGE,
+@@ -192,8 +188,8 @@
+     public void createMyPDF(View view) {
+ 
+         String date = new SimpleDateFormat("dd-MM-yyyy").format(new Date());
+-        String number = contractnumber.getText().toString();
+-        String partner = partnerfirst.getText().toString() + "," + partnersecond.getText().toString();
++        String number = contractNumber.getText().toString();
++        String partner = partnerFirst.getText().toString() + "," + partnerSecond.getText().toString();
+ 
+         PdfDocument myPdfDocument = new PdfDocument();
+         PdfDocument.PageInfo myPageInfo = new PdfDocument.PageInfo.Builder(2480, 3508, 1).create();
+@@ -208,17 +204,14 @@
+         myPage.getCanvas().drawText("Dokumentation über Zustand verfasst am " + date + "." + "/n/n Dokumentations Bilder:",
+                 200,850,myPaint);//200,850
+ 
+-        int i = 0;
++        for (int i = 0; i < 6; i++) {
+ 
+-        /*while (i < 6) {
+-
+-            BitmapDrawable drawable = (BitmapDrawable) imageView[1].getDrawable();
+-            Bitmap bitmap = drawable.getBitmap();
+-
+-            myPage.getCanvas().drawBitmap(bitmap, position[i][1], position[i][2], myPaint);
+-
+-            i++;
+-        }*/
++            if (imageView[i].equals(null)){
++                BitmapDrawable drawable = (BitmapDrawable) imageView[1].getDrawable();
++                Bitmap bitmap = drawable.getBitmap();
++                myPage.getCanvas().drawBitmap(bitmap, position[i][1], position[i][2], myPaint);
++            }
++        }
+         myPage.getCanvas().drawText(partner + " am " + date,200,3200,myPaint);//200,3200
+ 
+         myPdfDocument.finishPage(myPage);
+@@ -227,7 +220,7 @@
+ 
+         //File myFilePath = cw.getDir("documentDir", Context.MODE_PRIVATE);
+         //Environment.getExternalStorageDirectory().getPath() + "/myPDFFile.pdf";
+-        File myFile = new File(Environment.getExternalStorageDirectory().getPath() + "/myPDFFile.pdf"/*myFilePath,"Contract" + ".pdf"*/);
++        File myFile = new File(Environment.getExternalStorageDirectory().getPath() + "/myPDFFile33444.pdf"/*myFilePath,"Contract" + ".pdf"*/);
+         try {
+             myPdfDocument.writeTo(new FileOutputStream(myFile));
+             Toast.makeText(this, myFile.toString()/*myFilePath*/, Toast.LENGTH_LONG).show();
