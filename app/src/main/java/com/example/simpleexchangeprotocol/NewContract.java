@@ -26,6 +26,7 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.ParcelFileDescriptor;
 import android.provider.DocumentsContract;
 import android.provider.MediaStore;
 import android.util.DisplayMetrics;
@@ -35,8 +36,10 @@ import android.widget.ImageView;
 import android.widget.Toast;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.net.URI;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -47,14 +50,15 @@ public class NewContract extends AppCompatActivity {
     private int[][] position = new int[6][2];
     private File photoFile;
     private static final int REQUEST_CODE = 1;
+    private static final int CREATE_FILE = 2;
     private Bitmap header, footer;
     private ArrayList<Bitmap> documentPictures = new ArrayList<>();
     private int picCount = 0;
     private PaintView paintView;
     private int STORAGE_PERMISSION_CODE = 1;
     private EditText contractnumber,partnerfirst,partnersecond;
+    private PdfDocument myPdfDocument;
 
-    @RequiresApi(api = Build.VERSION_CODES.O)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -103,7 +107,11 @@ public class NewContract extends AppCompatActivity {
             imageView[picCount].setImageBitmap(takenImage);
             documentPictures.add(takenImage);
             picCount++;
-        } else {
+        } else if (requestCode == CREATE_FILE && resultCode == Activity.RESULT_OK) {
+            Uri PDFPath = data.getData();
+            System.out.println(PDFPath);
+            SavePDF(PDFPath);
+        }else {
             super.onActivityResult(requestCode, resultCode, data);
         }
     }
@@ -113,13 +121,14 @@ public class NewContract extends AppCompatActivity {
         String FILE_NAME = "photo" + picCount + ".jpg";
         photoFile = getPhotoFile(FILE_NAME);
 
-        Uri fileProvider = FileProvider.getUriForFile(this, "com.example.fileprovider", photoFile);
+        Uri fileProvider = FileProvider.getUriForFile(this, "com.example.android.fileprovider", photoFile);
         takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, fileProvider);
-        if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
+        //if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
+            System.out.println("Camera Exists");
             startActivityForResult(takePictureIntent, REQUEST_CODE);
-        } else {
+        /*} else {
             Toast.makeText(this, "Unable to open camera", Toast.LENGTH_SHORT).show();
-        }
+        }*/
     }
 
     private File getPhotoFile(String fileName) throws IOException {
@@ -195,7 +204,7 @@ public class NewContract extends AppCompatActivity {
         String number = contractnumber.getText().toString();
         String partner = partnerfirst.getText().toString() + "," + partnersecond.getText().toString();
 
-        PdfDocument myPdfDocument = new PdfDocument();
+        myPdfDocument = new PdfDocument();
         PdfDocument.PageInfo myPageInfo = new PdfDocument.PageInfo.Builder(2480, 3508, 1).create();
         PdfDocument.Page myPage = myPdfDocument.startPage(myPageInfo);
 
@@ -203,10 +212,14 @@ public class NewContract extends AppCompatActivity {
 
         //myPage.getCanvas().drawBitmap(header,200,100, myPaint); //200, 100
 
+        myPaint.setTextSize(42);
+
         myPage.getCanvas().drawText("Vertragsnummer: " + number,200,600,myPaint);//200, 600
 
-        myPage.getCanvas().drawText("Dokumentation über Zustand verfasst am " + date + "." + "/n/n Dokumentations Bilder:",
+        myPage.getCanvas().drawText("Dokumentation über Zustand verfasst am " + date + ".",
                 200,850,myPaint);//200,850
+
+        myPage.getCanvas().drawText("Dokumentations Bilder:",200,950,myPaint);//200,900
 
         int i = 0;
 
@@ -219,6 +232,9 @@ public class NewContract extends AppCompatActivity {
 
             i++;
         }*/
+
+        myPaint.setTextSize(32);
+
         myPage.getCanvas().drawText(partner + " am " + date,200,3200,myPaint);//200,3200
 
         myPdfDocument.finishPage(myPage);
@@ -229,22 +245,22 @@ public class NewContract extends AppCompatActivity {
         //Environment.getExternalStorageDirectory().getPath() + "/myPDFFile.pdf";
         File myFile = new File(Environment.getExternalStorageDirectory().getPath() + "/myPDFFile.pdf"/*myFilePath,"Contract" + ".pdf"*/);
         try {
-            myPdfDocument.writeTo(new FileOutputStream(myFile));
-            Toast.makeText(this, myFile.toString()/*myFilePath*/, Toast.LENGTH_LONG).show();
+            createFile(Uri.fromFile(myFile));
+            //Toast.makeText(this, myFile.toString()/*myFilePath*/, Toast.LENGTH_LONG).show();
         } catch (Exception e) {
             e.printStackTrace();
             System.out.println( "Could not save Pdf because of: " + e.toString());
             myFile.mkdir();
         }
 
-        myPdfDocument.close();
+        //myPdfDocument.close();
 
-        try {
+        /*try {
             openPdf(myFile);
-            //openFolder(Environment.getExternalStorageDirectory().getPath() + "/myPDFFile.pdf"/*myFilePath.toString()*/);
+            //openFolder(Environment.getExternalStorageDirectory().getPath() + "/myPDFFile.pdf"myFilePath.toString());
         }catch (Exception e){
             Toast.makeText(this, e.toString(), Toast.LENGTH_LONG).show();
-        }
+        }*/
     }
 
     private void openPdf(File fileToOpen) {
@@ -274,7 +290,7 @@ public class NewContract extends AppCompatActivity {
         startActivity(intent);
     }
 
-    /*public void CreatePDF(View view) throws IOException {
+    public void CreatePDF(View view) throws IOException {
 
         this.Save();
 
@@ -288,8 +304,6 @@ public class NewContract extends AppCompatActivity {
         PdfDocument.PageInfo pageInfo = new PdfDocument.PageInfo.Builder(width, height,1).create();
 
         PdfDocument.Page page = document.startPage(pageInfo);
-
-        Canvas canvas = page.getCanvas();
 
         //canvas.drawBitmap(header,0,0,picturePaint);
 
@@ -328,11 +342,9 @@ public class NewContract extends AppCompatActivity {
         } catch (ActivityNotFoundException e) {
            Toast.makeText(this, "Please install pdfViewer", Toast.LENGTH_LONG).show();
         }
-    }*/
+    }
 
-    private static final int CREATE_FILE = 1;
-
-    private void createFile(File pickerInitialUri) {
+    private void createFile(Uri pickerInitialUri) {
         Intent intent = new Intent(Intent.ACTION_CREATE_DOCUMENT);
         intent.addCategory(Intent.CATEGORY_OPENABLE);
         intent.setType("application/pdf");
@@ -347,7 +359,7 @@ public class NewContract extends AppCompatActivity {
     }
 
 
-        private void Save () {
+    private void Save () {
 
         System.out.println("Trying to save");
 
@@ -362,5 +374,24 @@ public class NewContract extends AppCompatActivity {
         /*Intent intent = new Intent(this, MainActivity.class);
         startActivity(intent);*/
 
+    }
+
+    private void SavePDF(Uri uri) {
+        try {
+            ParcelFileDescriptor pfd =
+                    getContentResolver().openFileDescriptor(uri, "w");
+            FileOutputStream fileOutputStream =
+                    new FileOutputStream(pfd.getFileDescriptor());
+            myPdfDocument.writeTo(fileOutputStream);
+            //fileOutputStream.write(("Overwritten at " + System.currentTimeMillis() +"\n").getBytes());
+            // Let the document provider know you're done by closing the stream.
+            fileOutputStream.close();
+            pfd.close();
+            myPdfDocument.close();
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }
