@@ -17,6 +17,8 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Camera;
+import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.pdf.PdfDocument;
@@ -36,6 +38,9 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.lang.reflect.Array;
+import java.lang.reflect.Executable;
 import java.net.URI;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -49,12 +54,15 @@ public class NewContract extends AppCompatActivity {
     private static final int REQUEST_CODE = 1;
     private static final int CREATE_FILE = 2;
     private Bitmap header, footer;
-    private ArrayList<Bitmap> documentPictures = new ArrayList<>();
+    private Bitmap[] documentPictures = new Bitmap[6];
     private int picCount = 0;
     private PaintView paintView;
     private int STORAGE_PERMISSION_CODE = 1;
     private EditText contractNumber, partnerFirst, partnerSecond;
     private PdfDocument myPdfDocument;
+    private int newWidth = 1200;
+    private int newHeight = 500;
+    private int upperAnchor;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -90,6 +98,15 @@ public class NewContract extends AppCompatActivity {
         partnerFirst = (EditText) findViewById(R.id.ContractPartnerFirstName);
         partnerSecond = (EditText) findViewById(R.id.ContractPartnerName);
 
+        try {
+            InputStream headerInput = getAssets().open("biefkopfcutout.png");
+            Bitmap headerCache = BitmapFactory.decodeStream(headerInput);
+            header = enlargeBitmap(headerCache, 2040);
+            upperAnchor = header.getHeight();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
         ActivityCompat.requestPermissions(NewContract.this,
                 new String[]{Manifest.permission.READ_EXTERNAL_STORAGE,
                         Manifest.permission.WRITE_EXTERNAL_STORAGE},
@@ -102,7 +119,7 @@ public class NewContract extends AppCompatActivity {
             //Bitmap takenImage = (Bitmap) data.getExtras().get("data");
             Bitmap takenImage = BitmapFactory.decodeFile(photoFile.getAbsolutePath());
             imageView[picCount].setImageBitmap(takenImage);
-            documentPictures.add(takenImage);
+            documentPictures[picCount] = takenImage;
             picCount++;
         } else if (requestCode == CREATE_FILE && resultCode == Activity.RESULT_OK) {
             Uri PDFPath = data.getData();
@@ -120,12 +137,12 @@ public class NewContract extends AppCompatActivity {
 
         Uri fileProvider = FileProvider.getUriForFile(this, "com.example.android.fileprovider", photoFile);
         takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, fileProvider);
-        //if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
+        if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
             System.out.println("Camera Exists");
             startActivityForResult(takePictureIntent, REQUEST_CODE);
-        /*} else {
+        } else {
             Toast.makeText(this, "Unable to open camera", Toast.LENGTH_SHORT).show();
-        }*/
+        }
     }
 
     private File getPhotoFile(String fileName) throws IOException {
@@ -207,29 +224,32 @@ public class NewContract extends AppCompatActivity {
 
         Paint myPaint = new Paint();
 
-        //myPage.getCanvas().drawBitmap(header,200,100, myPaint); //200, 100
+        myPage.getCanvas().drawBitmap(header,200,100, myPaint); //200, 100
 
         myPaint.setTextSize(42);
 
-        myPage.getCanvas().drawText("Vertragsnummer: " + number,200,600,myPaint);//200, 600
+        myPage.getCanvas().drawText("Vertragsnummer: " + number,200,upperAnchor + 250,myPaint);//200, 600
 
         myPage.getCanvas().drawText("Dokumentation über Zustand verfasst am " + date + ".",
-                200,850,myPaint);//200,850
+                200,upperAnchor + 350,myPaint);//200,850
 
-        myPage.getCanvas().drawText("Dokumentations Bilder:",200,950,myPaint);//200,900
+        myPage.getCanvas().drawText("Dokumentations Bilder:",200,upperAnchor + 450,myPaint);//200,900
 
-        for (int i = 0; i < 6; i++) {
+        int PositionCounter = 0;
 
-            if (imageView[i].equals(null)){
-                BitmapDrawable drawable = (BitmapDrawable) imageView[1].getDrawable();
-                Bitmap bitmap = drawable.getBitmap();
-                myPage.getCanvas().drawBitmap(bitmap, position[i][1], position[i][2], myPaint);
+        for (Bitmap PdfPic:documentPictures) {
+            if (PdfPic != null){
+                Bitmap resizedPic = getProperlySizedBitmap(PdfPic,1200,500);
+                myPage.getCanvas().drawBitmap(resizedPic,position[PositionCounter][0],position[PositionCounter][1], myPaint);
+                PositionCounter++;
             }
         }
 
+        myPage.getCanvas().drawBitmap(getProperlySizedBitmap(paintView.getmBitmap(),650,450),200,upperAnchor + 2500,myPaint);
+
         myPaint.setTextSize(32);
 
-        myPage.getCanvas().drawText(partner + " am " + date,200,3200,myPaint);//200,3200
+        myPage.getCanvas().drawText(partner + " am " + date,200,upperAnchor + 2750,myPaint);//200,3200
 
         myPdfDocument.finishPage(myPage);
 
@@ -237,7 +257,7 @@ public class NewContract extends AppCompatActivity {
 
         //File myFilePath = cw.getDir("documentDir", Context.MODE_PRIVATE);
         //Environment.getExternalStorageDirectory().getPath() + "/myPDFFile.pdf";
-        File myFile = new File(Environment.getExternalStorageDirectory().getPath() + "/myPDFFile33444.pdf"/*myFilePath,"Contract" + ".pdf"*/);
+        File myFile = new File(Environment.getExternalStorageDirectory().getPath());
         try {
             createFile(Uri.fromFile(myFile));
             //Toast.makeText(this, myFile.toString()/*myFilePath*/, Toast.LENGTH_LONG).show();
@@ -246,15 +266,103 @@ public class NewContract extends AppCompatActivity {
             System.out.println( "Could not save Pdf because of: " + e.toString());
             myFile.mkdir();
         }
+    }
 
-        //myPdfDocument.close();
+    private void createFile(Uri pickerInitialUri) {
+        Intent intent = new Intent(Intent.ACTION_CREATE_DOCUMENT);
+        intent.addCategory(Intent.CATEGORY_OPENABLE);
+        intent.setType("application/pdf");
+        String contractFileNumber = contractNumber.getText().toString();
+        if (!contractFileNumber.equals(""))
+            intent.putExtra(Intent.EXTRA_TITLE, "Vertrag" + contractFileNumber + ".pdf");
+        else
+            intent.putExtra(Intent.EXTRA_TITLE, "SampleContract.pdf");
+        // Optionally, specify a URI for the directory that should be opened in
+        // the system file picker when your app creates the document.
+        intent.putExtra(DocumentsContract.EXTRA_INITIAL_URI, pickerInitialUri);
 
-        /*try {
-            openPdf(myFile);
-            //openFolder(Environment.getExternalStorageDirectory().getPath() + "/myPDFFile.pdf"myFilePath.toString());
-        }catch (Exception e){
-            Toast.makeText(this, e.toString(), Toast.LENGTH_LONG).show();
-        }*/
+        startActivityForResult(intent, CREATE_FILE);
+
+    }
+
+
+    private void Save () {
+
+        System.out.println("Trying to save");
+
+        if (ContextCompat.checkSelfPermission(NewContract.this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+
+            System.out.println("Request permission");
+            requestStoragePermission();
+        }
+
+        paintView.saveImage();
+
+        /*Intent intent = new Intent(this, MainActivity.class);
+        startActivity(intent);*/
+
+    }
+
+    private void SavePDF(Uri uri) {
+        try {
+            ParcelFileDescriptor pfd =
+                    getContentResolver().openFileDescriptor(uri, "w");
+            FileOutputStream fileOutputStream =
+                    new FileOutputStream(pfd.getFileDescriptor());
+            myPdfDocument.writeTo(fileOutputStream);
+            //fileOutputStream.write(("Overwritten at " + System.currentTimeMillis() +"\n").getBytes());
+            // Let the document provider know you're done by closing the stream.
+            fileOutputStream.close();
+            pfd.close();
+            myPdfDocument.close();
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public Bitmap getProperlySizedBitmap(Bitmap bm, int newWidth, int newHeight) {
+        int width = bm.getWidth();
+        int height = bm.getHeight();
+        System.out.println(width + "," + height);
+        float resolution = ((float)width)/height;
+        System.out.println(resolution);
+        float resWidth = resolution * newHeight;
+        System.out.println(resWidth);
+        float futureWidth, futureHeight;
+        if (resWidth > newWidth){
+            futureHeight = resWidth / resolution;
+            futureWidth = newWidth;
+            System.out.println("Width bigger than " + newWidth);
+        }else{
+            futureHeight = newHeight;
+            futureWidth = resWidth;
+        }
+        System.out.println(futureWidth + "," + futureHeight);
+        return rescaleBitmap(bm, futureWidth,futureHeight,width,height);
+    }
+
+    private Bitmap enlargeBitmap(Bitmap bm, int newWidth){
+        int width = bm.getWidth();
+        int height = bm.getHeight();
+        float scaleWidth = newWidth/width;
+        float newHeight = height * scaleWidth;
+        return  rescaleBitmap(bm,newWidth,newHeight,width,height);
+    }
+
+    private Bitmap rescaleBitmap(Bitmap bm, float newWidth, float newHeight, int width, int height){
+        float scaleWidth = newWidth / width;
+        float scaleHeight = newHeight / height;
+        // CREATE A MATRIX FOR THE MANIPULATION
+        Matrix matrix = new Matrix();
+        // RESIZE THE BIT MAP
+        matrix.postScale(scaleWidth, scaleHeight);
+
+        // "RECREATE" THE NEW BITMAP
+        Bitmap resizedBitmap = Bitmap.createBitmap(
+                bm, 0, 0, width, height, matrix, false);
+        return resizedBitmap;
     }
 
     private void openPdf(File fileToOpen) {
@@ -335,57 +443,6 @@ public class NewContract extends AppCompatActivity {
             startActivity(intent);
         } catch (ActivityNotFoundException e) {
            Toast.makeText(this, "Please install pdfViewer", Toast.LENGTH_LONG).show();
-        }
-    }
-
-    private void createFile(Uri pickerInitialUri) {
-        Intent intent = new Intent(Intent.ACTION_CREATE_DOCUMENT);
-        intent.addCategory(Intent.CATEGORY_OPENABLE);
-        intent.setType("application/pdf");
-        intent.putExtra(Intent.EXTRA_TITLE, "invoice.pdf");
-
-        // Optionally, specify a URI for the directory that should be opened in
-        // the system file picker when your app creates the document.
-        intent.putExtra(DocumentsContract.EXTRA_INITIAL_URI, pickerInitialUri);
-
-        startActivityForResult(intent, CREATE_FILE);
-
-    }
-
-
-    private void Save () {
-
-        System.out.println("Trying to save");
-
-        if (ContextCompat.checkSelfPermission(NewContract.this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
-
-            System.out.println("Request permission");
-            requestStoragePermission();
-        }
-
-        paintView.saveImage();
-
-        /*Intent intent = new Intent(this, MainActivity.class);
-        startActivity(intent);*/
-
-    }
-
-    private void SavePDF(Uri uri) {
-        try {
-            ParcelFileDescriptor pfd =
-                    getContentResolver().openFileDescriptor(uri, "w");
-            FileOutputStream fileOutputStream =
-                    new FileOutputStream(pfd.getFileDescriptor());
-            myPdfDocument.writeTo(fileOutputStream);
-            //fileOutputStream.write(("Overwritten at " + System.currentTimeMillis() +"\n").getBytes());
-            // Let the document provider know you're done by closing the stream.
-            fileOutputStream.close();
-            pfd.close();
-            myPdfDocument.close();
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
         }
     }
 }
