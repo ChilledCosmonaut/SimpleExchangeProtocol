@@ -69,11 +69,17 @@ public class NewContract extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_new_contract);
         imageView[0] = findViewById(R.id.imageView);
+        imageView[0].setImageBitmap(ContractStorage.getDocumentPictures()[0]);
         imageView[1] = findViewById(R.id.imageView1);
+        imageView[1].setImageBitmap(ContractStorage.getDocumentPictures()[1]);
         imageView[2] = findViewById(R.id.imageView2);
+        imageView[2].setImageBitmap(ContractStorage.getDocumentPictures()[2]);
         imageView[3] = findViewById(R.id.imageView3);
+        imageView[3].setImageBitmap(ContractStorage.getDocumentPictures()[3]);
         imageView[4] = findViewById(R.id.imageView4);
+        imageView[4].setImageBitmap(ContractStorage.getDocumentPictures()[4]);
         imageView[5] = findViewById(R.id.imageView5);
+        imageView[5].setImageBitmap(ContractStorage.getDocumentPictures()[5]);
         paintView = findViewById(R.id.paintView);
         DisplayMetrics displayMetrics = new DisplayMetrics();
 
@@ -94,9 +100,12 @@ public class NewContract extends AppCompatActivity {
         position[5][0] = 1200;
         position[5][1] = 2400;
 
-        contractNumber = (EditText) findViewById(R.id.ContractNumberInput);
-        partnerFirst = (EditText) findViewById(R.id.ContractPartnerFirstName);
-        partnerSecond = (EditText) findViewById(R.id.ContractPartnerName);
+        contractNumber = findViewById(R.id.ContractNumberInput);
+        contractNumber.setText(ContractStorage.getContractNumber());
+        partnerFirst = findViewById(R.id.ContractPartnerFirstName);
+        partnerFirst.setText(ContractStorage.getPartnerFirst());
+        partnerSecond = findViewById(R.id.ContractPartnerName);
+        partnerSecond.setText(ContractStorage.getPartnerSecond());
 
         try {
             InputStream headerInput = getAssets().open("biefkopfcutout.png");
