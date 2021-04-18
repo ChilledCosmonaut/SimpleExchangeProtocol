@@ -92,7 +92,13 @@ public class PaintView extends View {
 
         }
 
-        canvas.drawBitmap(mBitmap, 0, 0, mBitmapPaint);
+        try {
+            canvas.drawBitmap(mBitmap, 0, 0, mBitmapPaint);
+        }
+        catch (Exception e){
+            System.out.println();
+        }
+
         canvas.restore();
 
     }
