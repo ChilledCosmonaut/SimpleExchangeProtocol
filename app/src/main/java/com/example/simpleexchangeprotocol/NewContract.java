@@ -122,6 +122,7 @@ public class NewContract extends AppCompatActivity {
                 PackageManager.PERMISSION_GRANTED);
     }
 
+    //Saves Pictures when destroyed
     @Override
     protected void onDestroy(){
         super.onDestroy();
