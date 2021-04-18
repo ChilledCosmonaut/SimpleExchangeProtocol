@@ -12,8 +12,8 @@ public class ContractStorage {
         return documentPictures;
     }
 
-    public static void setDocumentPictures(Bitmap[] documentPictures) {
-        ContractStorage.documentPictures = documentPictures;
+    public static void setDocumentPicturesAtIndex(Bitmap documentPictures, int index) {
+        ContractStorage.documentPictures[index] = documentPictures;
     }
 
     public static String getContractNumber() {

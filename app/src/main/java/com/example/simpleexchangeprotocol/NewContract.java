@@ -123,6 +123,15 @@ public class NewContract extends AppCompatActivity {
     }
 
     @Override
+    protected void onDestroy(){
+        super.onDestroy();
+        for (int i = 0; i < documentPictures.length; i++){
+            ContractStorage.setDocumentPicturesAtIndex(documentPictures[i],i);
+        }
+    }
+
+
+    @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         if (requestCode == REQUEST_CODE && resultCode == Activity.RESULT_OK) {
             //Bitmap takenImage = (Bitmap) data.getExtras().get("data");
