@@ -68,18 +68,12 @@ public class NewContract extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_new_contract);
-        imageView[0] = findViewById(R.id.imageView);
-        imageView[0].setImageBitmap(ContractStorage.getDocumentPictures()[0]);
-        imageView[1] = findViewById(R.id.imageView1);
-        imageView[1].setImageBitmap(ContractStorage.getDocumentPictures()[1]);
-        imageView[2] = findViewById(R.id.imageView2);
-        imageView[2].setImageBitmap(ContractStorage.getDocumentPictures()[2]);
-        imageView[3] = findViewById(R.id.imageView3);
-        imageView[3].setImageBitmap(ContractStorage.getDocumentPictures()[3]);
-        imageView[4] = findViewById(R.id.imageView4);
-        imageView[4].setImageBitmap(ContractStorage.getDocumentPictures()[4]);
-        imageView[5] = findViewById(R.id.imageView5);
-        imageView[5].setImageBitmap(ContractStorage.getDocumentPictures()[5]);
+        for(int imageCounter = 0; imageCounter < imageView.length; imageCounter++) {
+            imageView[imageCounter] = findViewById(R.id.imageView);
+
+            if(ContractStorage.getDocumentPictures()[imageCounter] != null)
+                imageView[imageCounter].setImageBitmap(ContractStorage.getDocumentPictures()[imageCounter]);
+        }
         paintView = findViewById(R.id.paintView);
         DisplayMetrics displayMetrics = new DisplayMetrics();
 
@@ -120,6 +114,8 @@ public class NewContract extends AppCompatActivity {
                 new String[]{Manifest.permission.READ_EXTERNAL_STORAGE,
                         Manifest.permission.WRITE_EXTERNAL_STORAGE},
                 PackageManager.PERMISSION_GRANTED);
+
+        Toast.makeText(this, "Created new Activity", Toast.LENGTH_LONG).show();
     }
 
     //Saves Pictures when destroyed
@@ -211,6 +207,7 @@ public class NewContract extends AppCompatActivity {
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
 
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         if (requestCode == STORAGE_PERMISSION_CODE) {
 
             if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
