@@ -17,80 +17,120 @@
             android:layout_height="wrap_content"
             android:orientation="vertical">
 
-            <TextView
-                android:id="@+id/ContractNumber"
-                android:layout_width="wrap_content"
+            <LinearLayout
+                android:id="@+id/firstLayout"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="12dp"
-                android:layout_marginTop="32dp"
-                android:text="@string/contractNumber"
-                android:textSize="22sp" />
+                android:layout_marginTop="10dp"
+                android:orientation="horizontal"
+                android:weightSum="2">
 
-            <EditText
-                android:id="@+id/ContractNumberInput"
-                android:layout_width="248dp"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="84dp"
-                android:ems="15"
-                android:textSize="22sp" />
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="12dp"
-                android:layout_marginTop="152dp"
-                android:text="@string/contractPartner"
-                android:textSize="22sp" />
+                <TextView
+                    android:id="@+id/ContractNumber"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="7dp"
+                    android:layout_marginTop="0dp"
+                    android:text="@string/contractNumber"
+                    android:textSize="22sp" />
 
-            <EditText
-                android:id="@+id/ContractPartnerName"
-                android:layout_width="74dp"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="268dp"
-                android:ems="8"
-                android:hint="@string/name"
-                android:textSize="22sp" />
+                <EditText
+                    android:id="@+id/ContractNumberInput"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="7dp"
+                    android:layout_marginTop="0dp"
+                    android:layout_marginEnd="7dp"
+                    android:ems="15"
+                    android:textSize="22sp" />
 
-            <EditText
-                android:id="@+id/ContractPartnerFirstName"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="208dp"
-                android:ems="8"
-                android:hint="@string/firstName"
-                android:textSize="22sp" />
+            </LinearLayout>
 
-            <TextView
-                android:layout_width="wrap_content"
+            <LinearLayout
+                android:id="@+id/secondLayout"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="24dp"
-                android:layout_marginTop="348dp"
-                android:text="@string/docPhotos"
-                android:textSize="22sp" />
+                android:layout_marginTop="5dp"
+                android:orientation="horizontal"
+                android:weightSum="2">
 
-            <TextView
-                android:layout_width="wrap_content"
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="7dp"
+                    android:layout_marginTop="0dp"
+                    android:text="@string/contractPartner"
+                    android:textSize="22sp" />
+
+                <EditText
+                    android:id="@+id/ContractPartnerFirstName"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="19dp"
+                    android:layout_marginTop="0dp"
+                    android:layout_marginEnd="7dp"
+                    android:ems="8"
+                    android:hint="@string/firstName"
+                    android:textSize="22sp" />
+
+                <EditText
+                    android:id="@+id/ContractPartnerName"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="-214dp"
+                    android:layout_marginTop="55dp"
+                    android:layout_marginEnd="7dp"
+                    android:ems="8"
+                    android:hint="@string/name"
+                    android:textSize="22sp" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/thirdLayout"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="24dp"
-                android:layout_marginTop="876dp"
-                android:text="@string/signature"
-                android:textSize="22sp" />
+                android:layout_marginTop="20dp"
+                android:orientation="horizontal"
+                android:weightSum="2">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="7dp"
+                    android:layout_marginTop="0dp"
+                    android:text="@string/docPhotos"
+                    android:textSize="22sp" />
+
+                <Button
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="10dp"
+                    android:layout_marginTop="0dp"
+                    android:layout_marginEnd="7dp"
+                    android:onClick="takePicture"
+                    android:text="@string/takePhoto"
+                    android:textSize="22sp" />
+
+            </LinearLayout>
 
             <HorizontalScrollView
                 android:layout_width="match_parent"
-                android:layout_height="match_parent">
+                android:layout_height="match_parent"
+                tools:ignore="SpeakableTextPresentCheck">
 
                 <LinearLayout
                     android:layout_width="wrap_content"
                     android:layout_height="match_parent"
-                    android:orientation="vertical">
+                    android:orientation="horizontal">
 
                     <ImageView
                         android:id="@+id/imageView"
                         android:layout_width="192dp"
                         android:layout_height="192dp"
-                        android:layout_marginStart="40dp"
-                        android:layout_marginTop="400dp"
+                        android:layout_marginStart="11dp"
+                        android:layout_marginTop="0dp"
                         android:maxWidth="128dp"
                         android:maxHeight="128dp"
                         app:srcCompat="@drawable/kamera" />
@@ -99,8 +139,8 @@
                         android:id="@+id/imageView1"
                         android:layout_width="192dp"
                         android:layout_height="192dp"
-                        android:layout_marginStart="304dp"
-                        android:layout_marginTop="400dp"
+                        android:layout_marginStart="11dp"
+                        android:layout_marginTop="0dp"
                         android:maxWidth="128dp"
                         android:maxHeight="128dp"
                         app:srcCompat="@drawable/kamera" />
@@ -109,8 +149,8 @@
                         android:id="@+id/imageView2"
                         android:layout_width="192dp"
                         android:layout_height="192dp"
-                        android:layout_marginStart="556dp"
-                        android:layout_marginTop="220dp"
+                        android:layout_marginStart="11dp"
+                        android:layout_marginTop="0dp"
                         android:maxWidth="128dp"
                         android:maxHeight="128dp"
                         app:srcCompat="@drawable/kamera" />
@@ -119,8 +159,8 @@
                         android:id="@+id/imageView3"
                         android:layout_width="192dp"
                         android:layout_height="192dp"
-                        android:layout_marginStart="292dp"
-                        android:layout_marginTop="440dp"
+                        android:layout_marginStart="11dp"
+                        android:layout_marginTop="0dp"
                         android:maxWidth="128dp"
                         android:maxHeight="128dp"
                         app:srcCompat="@drawable/kamera" />
@@ -129,8 +169,8 @@
                         android:id="@+id/imageView4"
                         android:layout_width="192dp"
                         android:layout_height="192dp"
-                        android:layout_marginStart="304dp"
-                        android:layout_marginTop="632dp"
+                        android:layout_marginStart="11dp"
+                        android:layout_marginTop="0dp"
                         android:maxWidth="128dp"
                         android:maxHeight="128dp"
                         app:srcCompat="@drawable/kamera" />
@@ -139,45 +179,57 @@
                         android:id="@+id/imageView5"
                         android:layout_width="192dp"
                         android:layout_height="192dp"
-                        android:layout_marginStart="556dp"
-                        android:layout_marginTop="453dp"
+                        android:layout_marginStart="11dp"
+                        android:layout_marginTop="0dp"
                         android:maxWidth="128dp"
                         android:maxHeight="128dp"
                         app:srcCompat="@drawable/kamera" />
                 </LinearLayout>
             </HorizontalScrollView>
 
-            <Button
-                android:layout_width="wrap_content"
+            <LinearLayout
+                android:id="@+id/fourthLayout"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="32dp"
-                android:layout_marginTop="632dp"
-                android:onClick="takePicture"
-                android:text="@string/takePhoto"
-                android:textSize="22sp" />
+                android:layout_marginTop="10dp"
+                android:orientation="horizontal"
+                android:weightSum="2">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="7dp"
+                    android:layout_marginTop="0dp"
+                    android:text="@string/signature"
+                    android:textSize="22sp" />
+
+                <Button
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="30dp"
+                    android:layout_marginTop="0dp"
+                    android:layout_marginEnd="7dp"
+                    android:onClick="ClearDrawingPad"
+                    android:text="@string/clearDrawboard"
+                    android:textSize="22sp" />
+
+            </LinearLayout>
 
             <com.example.simpleexchangeprotocol.PaintView
                 android:id="@+id/paintView"
                 android:layout_width="350dp"
                 android:layout_height="100dp"
-                android:layout_marginStart="188dp"
-                android:layout_marginTop="952dp"
+                android:layout_marginStart="25dp"
+                android:layout_marginTop="10dp"
+                android:layout_marginEnd="25dp"
                 android:textSize="18sp" />
 
             <Button
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="216dp"
-                android:layout_marginTop="868dp"
-                android:onClick="ClearDrawingPad"
-                android:text="@string/clearDrawboard"
-                android:textSize="22sp" />
-
-            <Button
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="608dp"
-                android:layout_marginTop="792dp"
+                android:layout_marginStart="120dp"
+                android:layout_marginTop="20dp"
+                android:layout_marginEnd="120dp"
                 android:onClick="createMyPDF"
                 android:text="@string/pdfFinish"
                 android:textSize="18sp" />
