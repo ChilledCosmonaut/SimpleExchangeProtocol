@@ -34,11 +34,11 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Vector;
 
 public class NewContract extends AppCompatActivity {
 
     private final ImageView[] imageView = new ImageView[6];
-    private final int[][] position = new int[6][2];
     private File photoFile;
     private static final int REQUEST_CODE = 1;
     private static final int CREATE_FILE = 2;
@@ -67,19 +67,6 @@ public class NewContract extends AppCompatActivity {
         getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
 
         paintView.initialise(displayMetrics);
-
-        position[0][0] = 200;
-        position[0][1] = 1100;
-        position[1][0] = 1200;
-        position[1][1] = 1100;
-        position[2][0] = 200;
-        position[2][1] = 1750;
-        position[3][0] = 1200;
-        position[3][1] = 1750;
-        position[4][0] = 200;
-        position[4][1] = 2400;
-        position[5][0] = 1200;
-        position[5][1] = 2400;
 
         /*
         Left or Right: Index % 2
@@ -210,7 +197,8 @@ public class NewContract extends AppCompatActivity {
         for (Bitmap PdfPic:documentPictures) {
             if (PdfPic != null){
                 Bitmap resizedPic = getProperlySizedBitmap(PdfPic,1200,500);
-                myPage.getCanvas().drawBitmap(resizedPic,position[PositionCounter][0],position[PositionCounter][1], myPaint);
+                Vector<Integer> photoPosition = getPhotoPosition(PositionCounter);
+                myPage.getCanvas().drawBitmap(resizedPic,photoPosition.get(0),photoPosition.get(1), myPaint);
                 PositionCounter++;
             }
         }
@@ -248,7 +236,7 @@ public class NewContract extends AppCompatActivity {
         // the system file picker when your app creates the document.
         intent.putExtra(DocumentsContract.EXTRA_INITIAL_URI, pickerInitialUri);
 
-        startActivityForResult(intent, CREATE_FILE);
+        //startActivityForResult(intent, CREATE_FILE);
 
     }
 
@@ -310,6 +298,19 @@ public class NewContract extends AppCompatActivity {
         // "RECREATE" THE NEW BITMAP
         return Bitmap.createBitmap(
                 bm, 0, 0, width, height, matrix, false);
+    }
+
+    public static Vector<Integer> getPhotoPosition(int photoIndex){
+        /*
+        Left or Right: Index % 2
+        Row: int row = Math.Floor(Index/2)
+         */
+        Vector<Integer> photoPosition = new Vector<>();
+
+        photoPosition.add(0, (photoIndex % 2) * 1000 + 200);
+        photoPosition.add(1, (int) Math.floor(photoIndex / 2) * 650 + 1100);
+
+        return photoPosition;
     }
 
 }
