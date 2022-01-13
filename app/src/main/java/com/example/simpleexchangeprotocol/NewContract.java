@@ -68,11 +68,6 @@ public class NewContract extends AppCompatActivity {
 
         paintView.initialise(displayMetrics);
 
-        /*
-        Left or Right: Index % 2
-        Row: int row = Math.Floor(Index/2)
-         */
-
         contractNumber = findViewById(R.id.ContractNumberInput);
         contractNumber.setText(ContractStorage.getContractNumber());
         partnerFirst = findViewById(R.id.ContractPartnerFirstName);
@@ -132,7 +127,6 @@ public class NewContract extends AppCompatActivity {
         Uri fileProvider = FileProvider.getUriForFile(this, "com.example.android.fileprovider", photoFile);
         takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, fileProvider);
         if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
-            System.out.println("Camera Exists");
             startActivityForResult(takePictureIntent, REQUEST_CODE);
         } else {
             Toast.makeText(this, "Unable to open camera", Toast.LENGTH_SHORT).show();
@@ -181,44 +175,57 @@ public class NewContract extends AppCompatActivity {
 
         Paint myPaint = new Paint();
 
-        myPage.getCanvas().drawBitmap(header,200,100, myPaint); //200, 100
+        //myPage.getCanvas().drawBitmap(header,200,100, myPaint); //200, 100
 
         myPaint.setTextSize(42);
 
-        myPage.getCanvas().drawText("Vertragsnummer: " + number,200,upperAnchor + 250,myPaint);//200, 600
+        myPage.getCanvas().drawText("Vertragsnummer: " + number,200,/*upperAnchor + */250,myPaint);//200, 600
 
         myPage.getCanvas().drawText("Dokumentation über Zustand verfasst am " + date + ".",
-                200,upperAnchor + 350,myPaint);//200,850
+                200,/*upperAnchor + */350,myPaint);//200,850
 
-        myPage.getCanvas().drawText("Dokumentations Bilder:",200,upperAnchor + 450,myPaint);//200,900
+        myPage.getCanvas().drawText("Dokumentations Bilder:",200,/*upperAnchor + */450,myPaint);//200,900
 
         int PositionCounter = 0;
 
-        for (Bitmap PdfPic:documentPictures) {
-            if (PdfPic != null){
-                Bitmap resizedPic = getProperlySizedBitmap(PdfPic,1200,500);
-                Vector<Integer> photoPosition = getPhotoPosition(PositionCounter);
-                myPage.getCanvas().drawBitmap(resizedPic,photoPosition.get(0),photoPosition.get(1), myPaint);
-                PositionCounter++;
+        try {
+
+            for (Bitmap PdfPic:documentPictures) {
+                if (PdfPic != null){
+                    Bitmap resizedPic = getProperlySizedBitmap(PdfPic,1200,500);
+                    Vector<Integer> photoPosition = getPhotoPosition(PositionCounter);
+                    myPage.getCanvas().drawBitmap(resizedPic,photoPosition.get(0),photoPosition.get(1), myPaint);
+                    PositionCounter++;
+                }
             }
+        }catch (Exception e){
+            e.printStackTrace();
+            Toast.makeText(this, "Unable to insert Pictures because of: " + e.toString(), Toast.LENGTH_LONG).show();
         }
 
-        myPage.getCanvas().drawBitmap(getProperlySizedBitmap(paintView.getmBitmap(),650,450),200,upperAnchor + 2500,myPaint);
-
+        try {
+            myPage.getCanvas().drawBitmap(getProperlySizedBitmap(paintView.getmBitmap(), 650, 450), 200, /*upperAnchor + */2500, myPaint);
+        }catch (Exception e){
+            e.printStackTrace();
+            Toast.makeText(this, "Unable to insert Signature because of: " + e.toString(), Toast.LENGTH_LONG).show();
+        }
         myPaint.setTextSize(32);
 
-        myPage.getCanvas().drawText(partner + " am " + date,200,upperAnchor + 2750,myPaint);//200,3200
+        myPage.getCanvas().drawText(partner + " am " + date,200,/*upperAnchor + */2750,myPaint);//200,3200
 
         myPdfDocument.finishPage(myPage);
 
         new ContextWrapper(getApplicationContext());
 
+
         File myFile = new File(Environment.getExternalStorageDirectory().getPath());
         try {
-            createFile(Uri.fromFile(myFile));
+            Uri contractPath = Uri.fromFile(myFile);
+            createFile(contractPath);
+            //Toast.makeText(this, "Contract saved at: " + contractPath.toString(), Toast.LENGTH_SHORT).show();
         } catch (Exception e) {
             e.printStackTrace();
-            System.out.println( "Could not save Pdf because of: " + e.toString());
+            Toast.makeText(this, "Could not save Pdf because of: " + e.toString(), Toast.LENGTH_SHORT).show();
             myFile.mkdir();
         }
     }
@@ -236,7 +243,7 @@ public class NewContract extends AppCompatActivity {
         // the system file picker when your app creates the document.
         intent.putExtra(DocumentsContract.EXTRA_INITIAL_URI, pickerInitialUri);
 
-        //startActivityForResult(intent, CREATE_FILE);
+        startActivityForResult(intent, CREATE_FILE);
 
     }
 
