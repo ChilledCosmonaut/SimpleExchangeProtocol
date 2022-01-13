@@ -243,7 +243,7 @@ public class NewContract extends AppCompatActivity {
         // the system file picker when your app creates the document.
         intent.putExtra(DocumentsContract.EXTRA_INITIAL_URI, pickerInitialUri);
 
-        //startActivityForResult(intent, CREATE_FILE);
+        startActivityForResult(intent, CREATE_FILE);
 
     }
 
