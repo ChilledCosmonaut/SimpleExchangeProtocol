@@ -179,12 +179,12 @@ public class NewContract extends AppCompatActivity {
 
         myPaint.setTextSize(42);
 
-        myPage.getCanvas().drawText("Vertragsnummer: " + number,200,upperAnchor + 250,myPaint);//200, 600
+        myPage.getCanvas().drawText("Vertragsnummer: " + number,200,/*upperAnchor + */250,myPaint);//200, 600
 
         myPage.getCanvas().drawText("Dokumentation über Zustand verfasst am " + date + ".",
-                200,upperAnchor + 350,myPaint);//200,850
+                200,/*upperAnchor + */350,myPaint);//200,850
 
-        myPage.getCanvas().drawText("Dokumentations Bilder:",200,upperAnchor + 450,myPaint);//200,900
+        myPage.getCanvas().drawText("Dokumentations Bilder:",200,/*upperAnchor + */450,myPaint);//200,900
 
         int PositionCounter = 0;
 
@@ -204,14 +204,14 @@ public class NewContract extends AppCompatActivity {
         }
 
         try {
-            myPage.getCanvas().drawBitmap(getProperlySizedBitmap(paintView.getmBitmap(), 650, 450), 200, upperAnchor + 2500, myPaint);
+            myPage.getCanvas().drawBitmap(getProperlySizedBitmap(paintView.getmBitmap(), 650, 450), 200, /*upperAnchor + */2500, myPaint);
         }catch (Exception e){
             e.printStackTrace();
             Toast.makeText(this, "Unable to insert Signature because of: " + e.toString(), Toast.LENGTH_LONG).show();
         }
         myPaint.setTextSize(32);
 
-        myPage.getCanvas().drawText(partner + " am " + date,200,upperAnchor + 2750,myPaint);//200,3200
+        myPage.getCanvas().drawText(partner + " am " + date,200,/*upperAnchor + */2750,myPaint);//200,3200
 
         myPdfDocument.finishPage(myPage);
 
@@ -222,7 +222,7 @@ public class NewContract extends AppCompatActivity {
         try {
             Uri contractPath = Uri.fromFile(myFile);
             createFile(contractPath);
-            Toast.makeText(this, "Contract saved at: " + contractPath.toString(), Toast.LENGTH_SHORT).show();
+            //Toast.makeText(this, "Contract saved at: " + contractPath.toString(), Toast.LENGTH_SHORT).show();
         } catch (Exception e) {
             e.printStackTrace();
             Toast.makeText(this, "Could not save Pdf because of: " + e.toString(), Toast.LENGTH_SHORT).show();
