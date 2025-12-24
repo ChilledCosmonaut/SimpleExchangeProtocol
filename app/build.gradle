@@ -20,7 +20,6 @@ android {
         }
     }
     namespace 'com.example.simpleexchangeprotocol'
-    buildToolsVersion '30.0.2'
 }
 
 dependencies {
