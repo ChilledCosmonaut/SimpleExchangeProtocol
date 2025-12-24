@@ -36,7 +36,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Vector;
 
-public class NewContract extends AppCompatActivity {
+public class PhotoDocumentation extends AppCompatActivity {
 
     private final ImageView[] imageView = new ImageView[6];
     private File photoFile;
@@ -54,7 +54,7 @@ public class NewContract extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_new_contract);
+        setContentView(R.layout.activity_photo_documentation);
         for(int imageCounter = 0; imageCounter < imageView.length; imageCounter++) {
             imageView[imageCounter] = findViewById(R.id.imageView);
 

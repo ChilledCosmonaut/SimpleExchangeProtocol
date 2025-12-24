@@ -39,8 +39,8 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
     }
 
-    public void ChangeActivity(View view) {
-        Intent intent = new Intent(getApplicationContext(), NewContract.class);
+    public void ProceedToSigning(View view) {
+        Intent intent = new Intent(getApplicationContext(), PhotoDocumentation.class);
         startActivity(intent);
     }
 
