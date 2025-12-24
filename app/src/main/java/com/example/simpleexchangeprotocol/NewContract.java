@@ -58,8 +58,8 @@ public class NewContract extends AppCompatActivity {
         for(int imageCounter = 0; imageCounter < imageView.length; imageCounter++) {
             imageView[imageCounter] = findViewById(R.id.imageView);
 
-            if(ContractStorage.getDocumentPictures()[imageCounter] != null)
-                imageView[imageCounter].setImageBitmap(ContractStorage.getDocumentPictures()[imageCounter]);
+            if(Contract.getPictures()[imageCounter] != null)
+                imageView[imageCounter].setImageBitmap(Contract.getPictures()[imageCounter]);
         }
         paintView = findViewById(R.id.paintView);
         DisplayMetrics displayMetrics = new DisplayMetrics();
@@ -69,11 +69,11 @@ public class NewContract extends AppCompatActivity {
         paintView.initialise(displayMetrics);
 
         contractNumber = findViewById(R.id.ContractNumberInput);
-        contractNumber.setText(ContractStorage.getContractNumber());
+        contractNumber.setText(Contract.getContractNumber());
         partnerFirst = findViewById(R.id.ContractPartnerFirstName);
-        partnerFirst.setText(ContractStorage.getPartnerFirst());
+        partnerFirst.setText(Contract.getPartnerFirst());
         partnerSecond = findViewById(R.id.ContractPartnerName);
-        partnerSecond.setText(ContractStorage.getPartnerSecond());
+        partnerSecond.setText(Contract.getPartnerSecond());
 
         try {
             InputStream headerInput = getAssets().open("biefkopfcutout.png");
@@ -97,7 +97,7 @@ public class NewContract extends AppCompatActivity {
     protected void onDestroy(){
         super.onDestroy();
         for (int i = 0; i < documentPictures.length; i++){
-            ContractStorage.setDocumentPicturesAtIndex(documentPictures[i],i);
+            Contract.setPictureAtIndex(documentPictures[i],i);
         }
     }
 
