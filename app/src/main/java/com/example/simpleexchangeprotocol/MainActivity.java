@@ -1,21 +1,18 @@
 package com.example.simpleexchangeprotocol;
 
-import androidx.activity.result.ActivityResultLauncher;
-import androidx.activity.result.contract.ActivityResultContracts;
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.FileProvider;
-import androidx.recyclerview.widget.GridLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
+import static com.example.simpleexchangeprotocol.functionality.FileHandler.CREATE_FILE;
 
 import android.Manifest;
+import android.app.Activity;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.pdf.PdfDocument;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
+import android.util.DisplayMetrics;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -24,12 +21,22 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Toast;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.FileProvider;
+import androidx.recyclerview.widget.GridLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
 import com.example.simpleexchangeprotocol.data.Contract;
+import com.example.simpleexchangeprotocol.data.Name;
+import com.example.simpleexchangeprotocol.functionality.FileHandler;
+import com.example.simpleexchangeprotocol.functionality.PdfGenerator;
 import com.example.simpleexchangeprotocol.functionality.PictureHandler;
 
 import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
 import java.util.List;
 
 
@@ -38,16 +45,18 @@ public class MainActivity extends AppCompatActivity {
 
     private RecyclerView photoRecyclerView;
     private PhotoAdapter photoAdapter;
-    private Bitmap header, footer;
     private final int STORAGE_PERMISSION_CODE = 1;
     private EditText contractNumber, partnerFirst, partnerSecond;
     private PdfDocument myPdfDocument;
+    private Uri filePath;
+    private PaintView paintView;
 
     private Contract contract = new Contract();
 
     private File ImageBuffer;
 
     private ActivityResultLauncher<Uri> takePictureIntent;
+    private ActivityResultLauncher<String> saveFileIntent;
 
     /**
      * Creates a file with a STATIC name.
@@ -55,6 +64,7 @@ public class MainActivity extends AppCompatActivity {
      */
     private File createStaticImageFile() {
         File storageDir = getExternalFilesDir("Pictures");
+        assert storageDir != null;
         if (!storageDir.exists()) {
             storageDir.mkdirs();
         }
@@ -66,10 +76,24 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        ActivityCompat.requestPermissions(MainActivity.this,
+                new String[]{Manifest.permission.READ_EXTERNAL_STORAGE,
+                        Manifest.permission.WRITE_EXTERNAL_STORAGE,
+                        Manifest.permission.CAMERA},
+                PackageManager.PERMISSION_GRANTED);
+
+
         photoRecyclerView = findViewById(R.id.photoRecyclerView);
         contractNumber = findViewById(R.id.ContractNumberInput);
         partnerFirst = findViewById(R.id.ContractPartnerFirstName);
         partnerSecond = findViewById(R.id.ContractPartnerName);
+
+        paintView = findViewById(R.id.paintView);
+        DisplayMetrics displayMetrics = new DisplayMetrics();
+
+        getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
+
+        paintView.initialise(displayMetrics);
 
         if (savedInstanceState != null) {
 
@@ -81,7 +105,7 @@ public class MainActivity extends AppCompatActivity {
         }
 
         if (contract.Number != null)
-            contractNumber.setText(contract.Number);
+            contractNumber.setText(String.valueOf(contract.Number));
         if (contract.Partner != null && contract.Partner.firstName != null)
             partnerFirst.setText(contract.Partner.firstName);
         if (contract.Partner != null && contract.Partner.lastName != null)
@@ -99,33 +123,20 @@ public class MainActivity extends AppCompatActivity {
         }
 
         // 3. Register the Camera Launcher (Once)
-        takePictureIntent = registerForActivityResult(
-                new ActivityResultContracts.TakePicture(),
-                result -> {
-                    if (result) {
-                        String newPath = PictureHandler.copyTempToPermanent(this, ImageBuffer);
-                        if (newPath != null) {
-                            contract.Images.add(newPath);
-                            photoAdapter.notifyItemInserted(contract.Images.size() - 1);
+        try {
+            takePictureIntent = PictureHandler.registerPictureIntent(this, result -> {
+                        if (result) {
+                            String newPath = PictureHandler.copyTempToPermanent(this, ImageBuffer);
+                            if (newPath != null) {
+                                contract.Images.add(newPath);
+                                photoAdapter.notifyItemInserted(contract.Images.size() - 1);
+                            }
                         }
                     }
-                }
-        );
-
-        // Move to PDF Generator
-        try {
-            InputStream headerInput = getAssets().open("biefkopfcutout.png");
-            Bitmap headerCache = BitmapFactory.decodeStream(headerInput);
-            //header = enlargeBitmap(headerCache, 2040);
-            //upperAnchor = header.getHeight();
-        } catch (IOException e) {
-            e.printStackTrace();
+            );
+        } catch (Exception e) {
+            throw new RuntimeException(e);
         }
-
-        ActivityCompat.requestPermissions(MainActivity.this,
-                new String[]{Manifest.permission.READ_EXTERNAL_STORAGE,
-                        Manifest.permission.WRITE_EXTERNAL_STORAGE},
-                PackageManager.PERMISSION_GRANTED);
     }
 
     @Override
@@ -150,6 +161,18 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        if (requestCode == CREATE_FILE && resultCode == Activity.RESULT_OK) {
+            assert data != null;
+            Uri PDFPath = data.getData();
+            System.out.println(PDFPath);
+            FileHandler.SavePDF(this, PDFPath, myPdfDocument);
+        }else {
+            super.onActivityResult(requestCode, resultCode, data);
+        }
+    }
+
     public void takePicture(View view) {
 
         Uri photoURI = FileProvider.getUriForFile(this, getPackageName() + ".fileprovider", ImageBuffer);
@@ -164,8 +187,33 @@ public class MainActivity extends AppCompatActivity {
         photoAdapter.notifyItemRemoved(deletedPath);
     }
 
-    public void generateContract(){
+    public void ClearDrawingPad(View view) {
+        paintView.clear();
+    }
 
+    public void generateContract(View view){
+        contract.Number = Integer.parseInt(contractNumber.getText().toString());
+        contract.Partner = new Name(partnerFirst.toString(), partnerSecond.toString());
+
+        try {
+            myPdfDocument = PdfGenerator.createMyPDF(this, contract, paintView);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        if (myPdfDocument == null){
+            return;
+        }
+
+        File myFile = new File(Environment.getExternalStorageDirectory().getPath());
+        try {
+            Uri contractPath = Uri.fromFile(myFile);
+            FileHandler.createFile(this, contractPath, contract);
+        } catch (Exception e) {
+            e.printStackTrace();
+            Toast.makeText(this, "Could not save Pdf because of: " + e.toString(), Toast.LENGTH_SHORT).show();
+            myFile.mkdir();
+        }
     }
 
     static class PhotoAdapter extends RecyclerView.Adapter<PhotoAdapter.PhotoViewHolder> {

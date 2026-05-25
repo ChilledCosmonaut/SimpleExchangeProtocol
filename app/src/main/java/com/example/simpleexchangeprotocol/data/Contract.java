@@ -1,14 +1,14 @@
 package com.example.simpleexchangeprotocol.data;
 
-import java.util.ArrayList;
-
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import java.util.ArrayList;
+
 public class Contract implements Parcelable {
-    public Integer Number;
-    public Name Creator;
-    public Name Partner;
+    public Integer Number = 0;
+    public Name Creator = new Name("", "");
+    public Name Partner = new Name("", "");
     public ArrayList<String> Images = new ArrayList<>();
 
     // Default Constructor

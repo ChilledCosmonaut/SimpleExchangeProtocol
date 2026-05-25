@@ -4,10 +4,8 @@ import android.Manifest;
 import android.app.Activity;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
 import android.net.Uri;
-import android.widget.ImageView;
 
 import androidx.activity.result.ActivityResultCallback;
 import androidx.activity.result.ActivityResultLauncher;
@@ -15,9 +13,6 @@ import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
-
-import com.example.simpleexchangeprotocol.R;
-import com.example.simpleexchangeprotocol.data.Contract;
 
 import java.io.File;
 import java.io.IOException;
@@ -29,9 +24,9 @@ import java.util.Locale;
 
 public class PictureHandler {
 
-    private static final int REQUEST_CAMERA_PERMISSION = 100;
+    public static final int REQUEST_CAMERA_PERMISSION = 100;
 
-    public static ActivityResultLauncher<Uri> registerPictureIntent(AppCompatActivity activity, File file, ActivityResultCallback<Boolean> onResult) throws Exception {
+    public static ActivityResultLauncher<Uri> registerPictureIntent(AppCompatActivity activity, ActivityResultCallback<Boolean> onResult) throws Exception {
         // Check for camera permission first
         if (checkCameraPermission(activity)) {
             return activity.registerForActivityResult(new ActivityResultContracts.TakePicture(), onResult);
@@ -73,7 +68,7 @@ public class PictureHandler {
         return rescaleBitmap(bitmap, scaleFactor);
     }
 
-    private static Bitmap getResizedBitmap(Bitmap bm, int newWidth){
+    public static Bitmap getResizedBitmap(Bitmap bm, int newWidth){
         int width = bm.getWidth();
         float scale = newWidth/width;
         return  rescaleBitmap(bm, scale);
