@@ -10,7 +10,7 @@ buildscript {
     dependencies {
         // Android Gradle Plugin – choose a version that matches your Gradle version.
         // 8.2.x works fine with AGP 8.2.0 (or newer). Adjust if you need a different AGP.
-        classpath 'com.android.tools.build:gradle:9.1.0'
+        classpath 'com.android.tools.build:gradle:9.2.1'
 
         // NOTE: Do NOT place your app‑specific dependencies here.
         // They belong in each module’s own build.gradle file.
