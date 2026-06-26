@@ -193,7 +193,7 @@ public class MainActivity extends AppCompatActivity {
 
     public void generateContract(View view){
         contract.Number = Integer.parseInt(contractNumber.getText().toString());
-        contract.Partner = new Name(partnerFirst.toString(), partnerSecond.toString());
+        contract.Partner = new Name(partnerFirst.getText().toString(), partnerSecond.getText().toString());
 
         try {
             myPdfDocument = PdfGenerator.createMyPDF(this, contract, paintView);

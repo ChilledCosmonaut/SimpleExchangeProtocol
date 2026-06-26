@@ -30,10 +30,5 @@ public class ExampleUnitTest {
         givenPosition[5][0] = 1200;
         givenPosition[5][1] = 2400;
 
-
-        Vector<Integer> calculatedPosition = PhotoDocumentation.getPhotoPosition(2);
-
-        assertEquals(200, (int) calculatedPosition.get(0));
-        assertEquals(1750, (int) calculatedPosition.get(1));
     }
 }

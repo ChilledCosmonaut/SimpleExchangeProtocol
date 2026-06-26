@@ -25,45 +25,79 @@ public class PdfGenerator {
 
         PdfDocument myPdfDocument = new PdfDocument();
         PdfDocument.PageInfo myPageInfo = new PdfDocument.PageInfo.Builder(2480, 3508, 1).create();
-        PdfDocument.Page myPage = myPdfDocument.startPage(myPageInfo);
+        PdfDocument.Page currentPage = myPdfDocument.startPage(myPageInfo);
 
         Paint myPaint = new Paint();
 
-        InputStream headerInput = activity.getAssets().open("biefkopfcutout.png");
+        int maxContentWidth = 2480 - 2 * 200;
+
+        InputStream headerInput = activity.getAssets().open("autovermietung_header.png");
         Bitmap headerCache = BitmapFactory.decodeStream(headerInput);
         Bitmap header = PictureHandler.getResizedBitmap(headerCache, 2040);
-        int upperAnchor = header.getHeight();
+        int headerHeight = header.getHeight();
 
-        myPage.getCanvas().drawBitmap(header,200,100, myPaint); //200, 100
+        InputStream footerInput = activity.getAssets().open("autovermietung_footer.png");
+        Bitmap footerCache = BitmapFactory.decodeStream(footerInput);
+        Bitmap footer = PictureHandler.getResizedBitmap(footerCache, 2040);
+        int footerHeight = footer.getHeight();
+
+        int usablePageSize = 3508 - headerHeight - footerHeight; // Add proper parameterized padding!
+
+        int leftPageSize = usablePageSize;
+
+        int pagePointer = headerHeight;
+
+        currentPage.getCanvas().drawBitmap(header,200,100, myPaint); //200, 100
 
         myPaint.setTextSize(42);
 
-        myPage.getCanvas().drawText("Vertragsnummer: " + number,200,upperAnchor + 250,myPaint);//200, 600
+        currentPage.getCanvas().drawText("Vertragsnummer: " + number,200,headerHeight + 250,myPaint);//200, 600
 
-        myPage.getCanvas().drawText("Dokumentation über Zustand verfasst am " + date + ".",
-                200,upperAnchor + 350,myPaint);//200,850
+        currentPage.getCanvas().drawText("Dokumentation über Zustand verfasst am " + date + ".",
+                200,headerHeight + 350,myPaint);//200,850
 
-        myPage.getCanvas().drawText("Dokumentations Bilder:",200,upperAnchor + 450,myPaint);//200,900
+        currentPage.getCanvas().drawText("Dokumentations Bilder:",200,headerHeight + 450,myPaint);//200,900
+
+        pagePointer += 500;
 
         int PositionCounter = 0;
 
         for (String imagePath:contract.Images) {
             Bitmap Image = BitmapFactory.decodeFile(imagePath);
-            if (Image != null) {
-                Bitmap resizedPic = PictureHandler.getResizedBitmap(Image, 1200, 500);
-                Vector<Integer> photoPosition = getPhotoPosition(PositionCounter);
-                myPage.getCanvas().drawBitmap(resizedPic, photoPosition.get(0), photoPosition.get(1), myPaint);
-                PositionCounter++;
+            if (Image == null) {
+                continue;
             }
-        }
 
-        myPage.getCanvas().drawBitmap(PictureHandler.getResizedBitmap(view.getmBitmap(), 650, 450), 200, /*upperAnchor + */2500, myPaint);
+            if (leftPageSize <= 500) {
+
+                currentPage.getCanvas().drawBitmap(footer,200,3508-footerHeight-100, myPaint); //200, 100
+                myPdfDocument.finishPage(currentPage);
+
+                myPageInfo = new PdfDocument.PageInfo.Builder(2480, 3508, 1).create();
+                currentPage = myPdfDocument.startPage(myPageInfo);
+                currentPage.getCanvas().drawBitmap(header,200,100, myPaint); //200, 100
+
+                leftPageSize = usablePageSize;
+                pagePointer = headerHeight;
+            }
+
+            Bitmap resizedPic = PictureHandler.getResizedBitmap(Image, 1200, 500);
+            currentPage.getCanvas().drawBitmap(resizedPic, (PositionCounter % 2) * 1000 + 200, pagePointer, myPaint);
+            PositionCounter++;
+            if (PositionCounter % 2 == 0) pagePointer += 650;
+            leftPageSize -= 500;
+        }
+        if (PositionCounter % 2 == 1) pagePointer += 650;
 
         myPaint.setTextSize(32);
 
-        myPage.getCanvas().drawText(partner + " am " + date,200,upperAnchor + 2750,myPaint);//200,3200
+        currentPage.getCanvas().drawText(partner + " am " + date ,200 ,pagePointer ,myPaint);//200,3200
+        pagePointer += 100;
 
-        myPdfDocument.finishPage(myPage);
+        currentPage.getCanvas().drawBitmap(PictureHandler.getResizedBitmap(view.getmBitmap(), 650, 600), 200, /*upperAnchor + */pagePointer, myPaint);
+
+        currentPage.getCanvas().drawBitmap(footer,200,3508-footerHeight-100, myPaint); //200, 100
+        myPdfDocument.finishPage(currentPage);
 
         return  myPdfDocument;
     }

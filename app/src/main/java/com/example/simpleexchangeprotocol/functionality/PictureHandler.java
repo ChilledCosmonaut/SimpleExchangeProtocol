@@ -70,7 +70,7 @@ public class PictureHandler {
 
     public static Bitmap getResizedBitmap(Bitmap bm, int newWidth){
         int width = bm.getWidth();
-        float scale = newWidth/width;
+        float scale = (float) newWidth/width;
         return  rescaleBitmap(bm, scale);
     }
 
