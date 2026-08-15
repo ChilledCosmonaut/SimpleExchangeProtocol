@@ -92,7 +92,7 @@
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:layout_marginStart="16dp"
-        android:layout_marginTop="168dp"
+        android:layout_marginTop="50dp"
         android:layout_marginEnd="16dp"
         android:layout_marginBottom="16dp"
         app:layout_constraintBottom_toTopOf="@id/textViewSignature"
@@ -121,6 +121,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
     <Button
+        android:id="@+id/SignatureClear"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="210dp"
@@ -132,33 +133,47 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <androidx.cardview.widget.CardView
-        android:layout_width="350dp"
-        android:layout_height="100dp"
-        android:layout_marginStart="180dp"
-        android:layout_marginTop="772dp"
-        app:cardElevation="8dp"
-        app:cardCornerRadius="6dp"
-        app:cardBackgroundColor="#FFFFFF"
+        android:id="@+id/drawingCardView"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginTop="50dp"
+        android:layout_marginBottom="16dp"
+        app:cardElevation="16dp"
+        app:cardCornerRadius="12dp"
+        app:layout_constraintDimensionRatio="16:9"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+        app:layout_constraintTop_toBottomOf="@id/SignatureClear">
 
         <com.example.simpleexchangeprotocol.PaintView
             android:id="@+id/paintView"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:padding="0dp"/>
+            android:padding="8dp"/>
     </androidx.cardview.widget.CardView>
 
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="608dp"
-        android:layout_marginTop="792dp"
+        android:layout_marginStart="200dp"
+        android:layout_marginTop="50dp"
         android:onClick="generateContract"
         android:text="@string/pdfFinish"
         android:textSize="18sp"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toBottomOf="@+id/drawingCardView" />
 
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="600dp"
+        android:layout_marginTop="50dp"
+        android:onClick="generateContract"
+        android:text="@string/pdfReset"
+        android:textSize="18sp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/drawingCardView" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

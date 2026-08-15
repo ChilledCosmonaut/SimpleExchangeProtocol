@@ -9,4 +9,5 @@
     <string name="clearDrawboard">Clear Signature</string>
     <string name="takePhoto">Take Photo</string>
     <string name="pdfFinish">Create pdf File</string>
+    <string name="pdfReset">Start New Pdf</string>
 </resources>
