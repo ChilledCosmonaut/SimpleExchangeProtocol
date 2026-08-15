@@ -157,13 +157,23 @@
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="608dp"
-        android:layout_marginTop="792dp"
+        android:layout_marginStart="200dp"
+        android:layout_marginTop="50dp"
         android:onClick="generateContract"
         android:text="@string/pdfFinish"
         android:textSize="18sp"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toBottomOf="@+id/drawingCardView" />
 
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="600dp"
+        android:layout_marginTop="50dp"
+        android:onClick="generateContract"
+        android:text="@string/pdfReset"
+        android:textSize="18sp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/drawingCardView" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
