@@ -217,22 +217,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void resetContract(View view){
-        // 1. Contract-Objekt komplett neu instanziieren
-        contract = new Contract();
-
-        // 2. UI-Felder zurücksetzen
-        contractNumber.setText("");
-        partnerFirst.setText("");
-        partnerSecond.setText("");
-
-        // 3. Bilder-Liste leeren
-        contract.Images.clear();
-        photoAdapter.notifyDataSetChanged();
-
-        // 4. Drawing Pad leeren
-        paintView.clear();
-
-        Toast.makeText(this, "Contract reset successfully", Toast.LENGTH_SHORT).show();
+        this.recreate();
     }
 
     static class PhotoAdapter extends RecyclerView.Adapter<PhotoAdapter.PhotoViewHolder> {

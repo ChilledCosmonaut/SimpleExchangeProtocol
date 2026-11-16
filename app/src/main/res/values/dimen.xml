@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Screen / section spacing -->
+    <dimen name="spacing_screen_padding">16dp</dimen>
+    <dimen name="spacing_section_top">24dp</dimen>
+    <dimen name="spacing_section_between">32dp</dimen>
+    <dimen name="spacing_row_vertical">8dp</dimen>
+    <dimen name="spacing_small">8dp</dimen>
+
+    <!-- Component sizing -->
+    <dimen name="photo_recycler_height">160dp</dimen>
+    <dimen name="signature_card_elevation">8dp</dimen>
+    <dimen name="signature_card_corner_radius">12dp</dimen>
+
+    <!-- Text sizes -->
+    <dimen name="text_size_label">18sp</dimen>
+    <dimen name="text_size_input">18sp</dimen>
+    <dimen name="text_size_button">16sp</dimen>
+</resources>
